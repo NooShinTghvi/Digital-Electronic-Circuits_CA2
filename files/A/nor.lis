@@ -1,0 +1,207 @@
+ ****** HSPICE -- A-2008.03 32-BIT (Feb 26 2008) winnt ******                   
+  Copyright (C) 2008 Synopsys, Inc. All Rights Reserved.                        
+  Unpublished-rights reserved under US copyright laws.
+  This program is protected by law and is subject to the 
+  terms and conditions of the license agreement found in:
+    C:\synopsys\Hspice_A-2008.03\license.warn
+  Use of this program is your acceptance to be bound by this 
+  license agreement. HSPICE is the trademark of Synopsys, Inc.
+  Input File: c:\users\mehrdad\desktop\ca2\a\nor.sp                             
+ Init: read install configuration file: C:\synopsys\Hspice_A-2008.03\meta.cfg
+ Init: hspice initialization file: C:\synopsys\Hspice_A-2008.03\hspice.ini
+
+
+
+
+
+ ***** params *****
+ .param  lmin=45n
+ +vdd = 1v
+ +gnd = 0v
+
+ *.global	vdd
+ .temp	25
+
+ ***** sources *****
+ *v      n+  n-  pulse   v1  v2  td  tr  tf  pw  per
+ vsply	1	0	dc	vdd
+ vina    a	0	dc  vdd
+ *pulse	0    vdd  5n  1ps  1ps 50ps    100ps
+ vinb    b	0	dc  vdd
+ *pulse	0    vdd  5n  1ps  1ps 50ps    100ps
+ vinc	c	0	dc  vdd
+ *pulse	0    vdd  5n  1ps  1ps 50ps    100ps
+
+ ***** nor gate *****
+ *m   	nd		ng 		ns		nb		model name		w
+ mp1		2	  	c   	1	    1		pmos	l='lmin'	w='12*lmin'
+ mp2     3  		b   	2     	2   	pmos	l='lmin'    w='12*lmin'
+ mp3     out  	a   	3     	3   	pmos	l='lmin'    w='12*lmin'
+
+ mn1	    out	   	a   	0  		0     	nmos	l='lmin'	w='2*lmin'
+ mn2     out    	b       0    	0     	nmos    l='lmin'    w='2*lmin'
+ mn3     out    	c       0    	0     	nmos    l='lmin'    w='2*lmin'
+
+ ***** capacitance *****
+ c1		out		0	0ff
+ ***** type of analysis *****
+ .tran	0.1ns     200ns   1ns
+
+ * calculation of average power over a given time period :
+ *.meas		tran	avgpower avg	power	from=0		to=6u
+
+ .measure tran tphl
+ + trig v(1) val = 'vdd/2'  rise = 1
+ + targ v(out) val = 'vdd/2'  fall = 1
+
+ .measure tran tplh
+ + trig v(1) val = 'vdd/2'  fall = 1
+ + targ v(out) val = 'vdd/2'  rise = 1
+
+ *.measure tran	tpd		param = ('(tplh+tphl)/2')
+
+ .measure tran t_rise
+ + trig v(out) val = '0.1*vdd'  rise = 1
+ + targ v(out) val = '0.9*vdd'  rise = 1
+
+ .measure tran t_fall
+ + trig v(out) val = '0.9*vdd'  fall = 1
+ + targ v(out) val = '0.1*vdd'  fall = 1
+
+ .op
+ .end
+
+ ***********************************************************************
+ ** runlvl is invoked, you can disable it by:
+      a) Add option runlvl=0 to your current simulation job.
+      b) Copy $installdir/hspice.ini to your HOME directory and
+         customize it by adding option runlvl=0, which disables
+         it for all of your simulation jobs.
+      c) Re-invoke $installdir/bin/config program and unselect the
+         option runlvl setting in box 'hspice.ini' which disables
+         it for whole group simulation jobs.
+
+ ** runlvl is invoked, some options are ignored or automatically set:
+      Options below are automatically set(user setting will overwrite them):
+      if runlvl=6,            .option bypass=0
+      if runlvl=[1|2|3|4|5],  .option bypass=2
+
+      Options below are ignored, they are replaced by automated algorithms:
+        lvltim    dvdt      ft    fast   trtol  absvar  relvar
+          relq  chgtol    dvtr    imin    itl3    rmax
+
+ ** runlvl is invoked, actual option value used by HSPICE are:
+       runlvl= 3       bypass= 2      mbypass=   2.00   bytol= 100.00u
+ ***********************************************************************
+
+
+ **warning** recommend to set start explicitly:
+             .TRAN tstep tstop START=val
+
+
+
+
+  **warning**  in element=  0:c1               defined in subckt 0               
+     capacitance =    0.00     <= 0 farad, please verify it.
+
+
+ ** warning** associated with encrypted blocks were suppressed
+
+ 
+      
+1****** HSPICE -- A-2008.03 32-BIT (Feb 26 2008) winnt ******                   
+ ******  
+ * or                                                                           
+  ******  operating point information      tnom=  25.000 temp=  25.000          
+ ******  
+ ***** operating point status is all       simulation time is     0.     
+    node    =voltage      node    =voltage      node    =voltage
+
+ +0:1       =   1.0000  0:2       = 972.1382m 0:3       = 856.6468m
+ +0:a       =   1.0000  0:b       =   1.0000  0:c       =   1.0000 
+ +0:out     = 389.3021n
+
+
+ ****  voltage sources
+
+ subckt                                              
+ element  0:vsply    0:vina     0:vinb     0:vinc    
+  volts      1.0000     1.0000     1.0000     1.0000 
+  current  -14.0862p -422.5959p  -33.8648p  -30.9958p
+  power     14.0862p  422.5959p   33.8648p   30.9958p
+
+     total voltage source power dissipation=  501.5427p       watts
+
+
+
+
+ **** mosfets
+
+
+ subckt                                                                    
+ element  0:mp1      0:mp2      0:mp3      0:mn1      0:mn2      0:mn3     
+ model    0:pmos     0:pmos     0:pmos     0:nmos     0:nmos     0:nmos    
+ region       Cutoff     Cutoff     Cutoff     Linear     Linear     Linear
+  id       -14.0517p  -14.5168p  -19.5133p  148.6096p  148.6096p  148.6096p
+  ibs     -3.214e-26 -1.178e-25 -8.137e-25  1.205e-23  1.205e-23  1.205e-23
+  ibd       34.4809f  125.3798f  866.6464f -5.408e-19 -5.408e-19 -5.408e-19
+  vgs        0.        27.8618m  143.3532m    1.0000     1.0000     1.0000 
+  vds      -27.8618m -115.4914m -856.6464m  389.3021n  389.3021n  389.3021n
+  vbs        0.         0.         0.         0.         0.         0.     
+  vth     -483.3718m -470.0826m -357.6855m  466.7821m  466.7821m  466.7821m
+  vdsat    -45.1936m  -45.1405m  -44.6225m  336.2135m  336.2135m  336.2135m
+  vod      483.3718m  497.9444m  501.0386m  533.2179m  533.2179m  533.2179m
+  beta       4.7653m    4.8616m    5.8244m    2.2922m    2.2922m    2.2922m
+  gam eff  400.0000m  400.0000m  400.0000m  400.0000m  400.0000m  400.0000m
+  gm       396.4649p  409.7170p  550.7697p   61.4048p   61.4048p   61.4048p
+  gds      365.9679p   78.1038p   96.4713p  381.7332u  381.7332u  381.7332u
+  gmb      102.9038p  106.7926p  144.4519p   28.3860p   28.3860p   28.3860p
+  cdtot    476.4936a  445.3194a  359.7632a  131.0126a  131.0126a  131.0126a
+  cgtot    483.9933a  454.9739a  391.0084a  121.0778a  121.0778a  121.0778a
+  cstot    646.6518a  640.5786a  616.4530a  114.5235a  114.5235a  114.5235a
+  cbtot    757.2200a  751.3508a  717.1099a  125.4014a  125.4014a  125.4014a
+  cgs      215.5177a  209.4446a  185.3191a   67.4610a   67.4610a   67.4610a
+  cgd      209.4426a  185.3170a  139.7393a   53.3768a   53.3768a   53.3768a
+
+
+
+ ******  
+ * or                                                                           
+  ******  transient analysis               tnom=  25.000 temp=  25.000          
+ ******  
+
+**warning** measure results may be incorrect
+       since initial start time is non-zero.
+   tphl= failed                          trig= not found
+   tplh= failed                          trig= not found
+   t_rise= failed                          trig= not found
+   t_fall= failed                          trig= not found
+
+          ***** job concluded
+1****** HSPICE -- A-2008.03 32-BIT (Feb 26 2008) winnt ******                   
+ ******  
+ * or                                                                           
+  ******  job statistics summary           tnom=  25.000 temp=  25.000          
+ ******  
+
+           total memory used        173 kbytes
+
+  # nodes =      32 # elements=      11
+  # diodes=       0 # bjts    =       0 # jfets   =       0 # mosfets =       6
+  # va device =       0
+
+    analysis           time    # points   tot. iter  conv.iter
+
+    op point           0.01           1          10
+    transient          0.09        1991          54          27 rev=         0
+    readin             0.02
+    errchk             0.01
+    setup              0.01
+    output             0.00
+           total cpu time          0.18 seconds
+           total elapsed time         1 seconds
+               job started at  06:58:35 11/08/2018
+               job ended   at  06:58:35 11/08/2018
+
+
+ Init: hspice initialization file: C:\synopsys\Hspice_A-2008.03\hspice.ini
