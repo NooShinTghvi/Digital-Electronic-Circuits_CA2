@@ -1,0 +1,221 @@
+ ****** HSPICE -- A-2008.03 32-BIT (Feb 26 2008) winnt ******                   
+  Copyright (C) 2008 Synopsys, Inc. All Rights Reserved.                        
+  Unpublished-rights reserved under US copyright laws.
+  This program is protected by law and is subject to the 
+  terms and conditions of the license agreement found in:
+    C:\synopsys\Hspice_A-2008.03\license.warn
+  Use of this program is your acceptance to be bound by this 
+  license agreement. HSPICE is the trademark of Synopsys, Inc.
+  Input File: c:\users\mehrdad\desktop\ca2\b\nor.sp                             
+ Init: read install configuration file: C:\synopsys\Hspice_A-2008.03\meta.cfg
+ Init: hspice initialization file: C:\synopsys\Hspice_A-2008.03\hspice.ini
+ **warning** (c:\users\mehrdad\desktop\ca2\b\nor.sp:11) symbol: + is ignored 
+
+
+
+
+
+ ********* vectors ********
+ .vec 'vectortest.txt'
+
+ ***** params *****
+ .param  +vdd = 1v
+ +gnd = 0v
+ +lmin=45n
+ +b = 2
+ +wp = 6
+ +wn = 1
+
+ +slp = 0.1p
+ +out_t_dly = 12.95
+ +prd = 11.37
+
+ ***** temperature *****
+ .temp	25
+
+ ***** sources *****
+ *v      n+  n-  pulse   v1  v2  td  tr  tf  pw  per
+ vsply	1	0	dc	vdd
+ *vina    a	0	dc  gnd
+ *vinb    b	0	dc  gnd
+ *vinc	c	0	pulse  0   vdd 5n  1ps 1ps 50ps    100ps
+
+ ***** nor gate *****
+ *m   	nd		ng 		ns		nb		model name		w
+ mp1		2	  	c   	1	    1		pmos	l='lmin'	w='lmin*b*wp'
+ mp2     3  		b   	2     	2   	pmos	l='lmin'    w='lmin*b*wp'
+ mp3     out  	a   	3     	3   	pmos	l='lmin'    w='lmin*b*wp'
+
+ mn1	    out	   	a   	0  		0     	nmos	l='lmin'	w='lmin*b*wn'
+ mn2     out    	b       0    	0     	nmos    l='lmin'    w='lmin*b*wn'
+ mn3     out    	c       0    	0     	nmos    l='lmin'    w='lmin*b*wn'
+
+ ***** capacitance *****
+ *c1		out		0	0ff
+
+ ***** type of analysis *****
+
+ ***** transient analysis:
+ .tran	0.1ns     200ns   1ns
+
+ ***** power :
+ *.meas		tran	avgpower avg	power	from=0		to=6u
+ .meas tran avgpower avg  power
+
+ ***** maximum operating frequency :
+ .measure maxf param = '1 /(t_rise + t_fall)'
+
+ ***** propagation delay :
+ .measure tran tphl
+ + trig v(c) val = 'vdd/2'  rise = 1
+ + targ v(out) val = 'vdd/2'  fall = 1
+
+ .measure tran tplh
+ + trig v(c) val = 'vdd/2'  fall = 1
+ + targ v(out) val = 'vdd/2'  rise = 1
+
+ .measure tran   tpd   param = ('(tplh+tphl)/2')
+
+ ***** transition time :
+ .measure tran t_rise
+ + trig v(out) val = '0.1*vdd'  rise = 1
+ + targ v(out) val = '0.9*vdd'  rise = 1
+
+ .measure tran t_fall
+ + trig v(out) val = '0.9*vdd'  fall = 1
+ + targ v(out) val = '0.1*vdd'  fall = 1
+
+ .op
+ .end
+
+ ***********************************************************************
+ ** runlvl is invoked, you can disable it by:
+      a) Add option runlvl=0 to your current simulation job.
+      b) Copy $installdir/hspice.ini to your HOME directory and
+         customize it by adding option runlvl=0, which disables
+         it for all of your simulation jobs.
+      c) Re-invoke $installdir/bin/config program and unselect the
+         option runlvl setting in box 'hspice.ini' which disables
+         it for whole group simulation jobs.
+
+ ** runlvl is invoked, some options are ignored or automatically set:
+      Options below are automatically set(user setting will overwrite them):
+      if runlvl=6,            .option bypass=0
+      if runlvl=[1|2|3|4|5],  .option bypass=2
+
+      Options below are ignored, they are replaced by automated algorithms:
+        lvltim    dvdt      ft    fast   trtol  absvar  relvar
+          relq  chgtol    dvtr    imin    itl3    rmax
+
+ ** runlvl is invoked, actual option value used by HSPICE are:
+       runlvl= 3       bypass= 2      mbypass=   2.00   bytol= 100.00u
+ ***********************************************************************
+
+
+ **warning** recommend to set start explicitly:
+             .TRAN tstep tstop START=val
+
+
+ ** warning** associated with encrypted blocks were suppressed
+
+ 
+      
+1****** HSPICE -- A-2008.03 32-BIT (Feb 26 2008) winnt ******                   
+ ******  
+ * nor                                                                          
+  ******  operating point information      tnom=  25.000 temp=  25.000          
+ ******  
+ ***** operating point status is all       simulation time is     0.     
+    node    =voltage      node    =voltage      node    =voltage
+
+ +0:1       =   1.0000  0:2       = 999.9949m 0:3       = 999.9905m
+ +0:a       = 8.101e-22 0:b       = 8.101e-22 0:c       = 8.101e-22
+ +0:out     = 999.9866m
+
+
+ ****  voltage sources
+
+ subckt             
+ element  0:vsply   
+  volts      1.0000 
+  current   -7.2501n
+  power      7.2501n
+
+     total voltage source power dissipation=    7.2501n       watts
+
+
+
+
+ **** mosfets
+
+
+ subckt                                                                    
+ element  0:mp1      0:mp2      0:mp3      0:mn1      0:mn2      0:mn3     
+ model    0:pmos     0:pmos     0:pmos     0:nmos     0:nmos     0:nmos    
+ region       Linear     Linear     Linear     Cutoff     Cutoff     Cutoff
+  id        -6.8434n   -6.0461n   -5.2488n    1.6056n    1.6056n    1.6056n
+  ibs     -2.996e-23 -2.996e-23 -2.996e-23  9.475e-25  9.475e-25  9.475e-25
+  ibd        7.0188a    6.2011a    5.3834a   -1.0100p   -1.0100p   -1.0100p
+  vgs       -1.0000  -999.9949m -999.9905m  8.101e-22  8.101e-22  8.101e-22
+  vds       -5.0525u   -4.4639u   -3.8752u  999.9866m  999.9866m  999.9866m
+  vbs        0.         0.         0.         0.         0.         0.     
+  vth     -487.5963m -487.5964m -487.5965m  339.7762m  339.7762m  339.7762m
+  vdsat   -386.0191m -386.0160m -386.0133m   39.3010m   39.3010m   39.3010m
+  vod     -512.4037m -512.3986m -512.3940m -339.7762m -339.7762m -339.7762m
+  beta       4.5054m    4.5054m    4.5054m    4.2726m    4.2726m    4.2726m
+  gam eff  400.0000m  400.0000m  400.0000m  400.0000m  400.0000m  400.0000m
+  gm         6.4909n    5.7347n    4.9786n   42.7390n   42.7390n   42.7390n
+  gds        1.3545m    1.3545m    1.3545m    6.0149n    6.0149n    6.0149n
+  gmb        2.2192n    1.9607n    1.7021n   10.8593n   10.8593n   10.8593n
+  cdtot    815.6665a  815.6666a  815.6667a   56.9477a   56.9477a   56.9477a
+  cgtot    794.4980a  794.4977a  794.4974a   63.1572a   63.1572a   63.1572a
+  cstot    722.7422a  722.7418a  722.7415a  104.4557a  104.4557a  104.4557a
+  cbtot    753.3718a  753.3719a  753.3720a  117.0379a  117.0379a  117.0379a
+  cgs      452.3349a  452.3344a  452.3340a   32.6002a   32.6002a   32.6002a
+  cgd      341.2075a  341.2076a  341.2077a   21.1615a   21.1615a   21.1615a
+
+
+
+ ******  
+ * nor                                                                          
+  ******  transient analysis               tnom=  25.000 temp=  25.000          
+ ******  
+
+**warning** measure results may be incorrect
+       since initial start time is non-zero.
+   avgpower=  1.4317E-09  from=  1.0000E-09     to=  2.0000E-07
+   maxf= -1.2346E-29
+   tphl= failed                          trig= not found
+   tplh= failed                          trig= not found
+   tpd= failed                         measure parameter failed
+   t_rise= failed                          trig= not found
+   t_fall= failed                          trig= not found
+
+          ***** job concluded
+1****** HSPICE -- A-2008.03 32-BIT (Feb 26 2008) winnt ******                   
+ ******  
+ * nor                                                                          
+  ******  job statistics summary           tnom=  25.000 temp=  25.000          
+ ******  
+
+           total memory used        174 kbytes
+
+  # nodes =      32 # elements=       7
+  # diodes=       0 # bjts    =       0 # jfets   =       0 # mosfets =       6
+  # va device =       0
+
+    analysis           time    # points   tot. iter  conv.iter
+
+    op point           0.02           1          11
+    transient          0.17        1991         353         126 rev=         0
+    readin             0.01
+    errchk             0.01
+    setup              0.01
+    output             0.00
+           total cpu time          0.28 seconds
+           total elapsed time         1 seconds
+               job started at  14:26:48 11/08/2018
+               job ended   at  14:26:49 11/08/2018
+
+
+ Init: hspice initialization file: C:\synopsys\Hspice_A-2008.03\hspice.ini
